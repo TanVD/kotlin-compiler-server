@@ -29,3 +29,10 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Kotlin ###
+1.4.30
+1.4.30-js
+
+indexes.json
+indexesJs.json

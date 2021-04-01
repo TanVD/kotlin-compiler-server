@@ -1,7 +1,7 @@
 package com.compiler.server.compiler.components
 
-import com.compiler.server.compiler.KotlinFile
 import com.compiler.server.compiler.KotlinResolutionFacade
+import com.compiler.server.compiler.file.KotlinFile
 import com.compiler.server.model.Analysis
 import com.compiler.server.model.ErrorDescriptor
 import common.model.Completion
@@ -67,7 +67,7 @@ class CompletionProvider(
       val prefix = (if (descriptorInfo.isTipsManagerCompletion) element.text else element.parent.text)
         .substringBefore(COMPLETION_SUFFIX).let { if (it.endsWith(".")) "" else it }
       val importCompletionVariants = if (indexationProvider.hasIndexes(isJs)) {
-        val (errors, _) = errorAnalyzer.errorsFrom(listOf(file.kotlinFile), coreEnvironment, isJs)
+        val (errors, _) = errorAnalyzer.errorsFrom(listOf(file.file), coreEnvironment, isJs)
         importVariants(file, prefix, errors, line, character, isJs)
       } else emptyList()
       descriptorInfo.descriptors.toMutableList().apply {
@@ -118,7 +118,7 @@ class CompletionProvider(
   ): List<Completion> {
     val importCompletionVariants = indexationProvider.getClassesByName(prefix, isJs)
       ?.map { it.toCompletion() } ?: emptyList()
-    val currentErrors = errors[file.kotlinFile.name]?.filter {
+    val currentErrors = errors[file.file.name]?.filter {
       it.interval.start.line == line &&
         it.interval.start.ch <= character &&
         it.interval.end.line == line &&
@@ -126,7 +126,7 @@ class CompletionProvider(
         it.message.startsWith(IndexationProvider.UNRESOLVED_REFERENCE_PREFIX)
     } ?: emptyList()
     if (currentErrors.isNotEmpty()) return importCompletionVariants
-    val oldImports = file.kotlinFile.importList?.imports?.mapNotNull { it.importPath.toString() } ?: emptyList()
+    val oldImports = file.file.importList?.imports?.mapNotNull { it.importPath.toString() } ?: emptyList()
     val suggestions = importCompletionVariants.filter { !oldImports.contains(it.import) }
     return suggestions.onEach { completion -> completion.hasOtherImports = true }
   }
@@ -194,7 +194,7 @@ class CompletionProvider(
     isJs: Boolean,
     coreEnvironment: KotlinCoreEnvironment
   ): DescriptorInfo {
-    val files = listOf(file.kotlinFile)
+    val files = listOf(file.file)
     val analysis = if (isJs.not())
       errorAnalyzer.analysisOf(files, coreEnvironment)
     else

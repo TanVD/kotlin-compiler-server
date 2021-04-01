@@ -1,10 +1,13 @@
 package com.compiler.server.service
 
-import com.compiler.server.compiler.KotlinFile
-import com.compiler.server.compiler.components.*
+import com.compiler.server.compiler.components.CompletionProvider
+import com.compiler.server.compiler.components.ErrorAnalyzer
+import com.compiler.server.compiler.components.KotlinCompiler
+import com.compiler.server.compiler.components.KotlinToJSTranslator
+import com.compiler.server.compiler.file.KotlinFile
 import com.compiler.server.model.*
-import common.model.Completion
 import com.compiler.server.model.bean.VersionInfo
+import common.model.Completion
 import component.KotlinEnvironment
 import org.apache.commons.logging.LogFactory
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
@@ -24,21 +27,21 @@ class KotlinProjectExecutor(
 
   fun run(project: Project): ExecutionResult {
     return kotlinEnvironment.environment { environment ->
-      val files = getFilesFrom(project, environment).map { it.kotlinFile }
+      val files = getFilesFrom(project, environment).map { it.file }
       kotlinCompiler.run(files, environment, project.args)
     }
   }
 
   fun test(project: Project): ExecutionResult {
     return kotlinEnvironment.environment { environment ->
-      val files = getFilesFrom(project, environment).map { it.kotlinFile }
+      val files = getFilesFrom(project, environment).map { it.file }
       kotlinCompiler.test(files, environment)
     }
   }
 
   fun convertToJs(project: Project): TranslationJSResult {
     return kotlinEnvironment.environment { environment ->
-      val files = getFilesFrom(project, environment).map { it.kotlinFile }
+      val files = getFilesFrom(project, environment).map { it.file }
       kotlinToJSTranslator.translate(
         files,
         project.args.split(" "),
@@ -50,7 +53,7 @@ class KotlinProjectExecutor(
 
   fun convertToJsIr(project: Project): TranslationJSResult {
     return kotlinEnvironment.environment { environment ->
-      val files = getFilesFrom(project, environment).map { it.kotlinFile }
+      val files = getFilesFrom(project, environment).map { it.file }
       kotlinToJSTranslator.translate(
         files,
         project.args.split(" "),
@@ -75,7 +78,7 @@ class KotlinProjectExecutor(
 
   fun highlight(project: Project): Map<String, List<ErrorDescriptor>> {
     return kotlinEnvironment.environment { environment ->
-      val files = getFilesFrom(project, environment).map { it.kotlinFile }
+      val files = getFilesFrom(project, environment).map { it.file }
       try {
         val isJs = project.confType.isJsRelated()
         errorAnalyzer.errorsFrom(
@@ -93,6 +96,6 @@ class KotlinProjectExecutor(
   fun getVersion() = version
 
   private fun getFilesFrom(project: Project, coreEnvironment: KotlinCoreEnvironment) = project.files.map {
-    KotlinFile.from(coreEnvironment.project, it.name, it.text)
+    KotlinFile.from(project.confType, coreEnvironment.project, it.name, it.text)
   }
 }

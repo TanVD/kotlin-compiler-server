@@ -50,6 +50,7 @@ plugins {
 
 allprojects {
     repositories {
+        mavenLocal()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/kotlin-ide")
         maven("https://kotlin.bintray.com/kotlin-ide-plugin-dependencies")
@@ -74,6 +75,8 @@ dependencies {
     kotlinDependency("com.fasterxml.jackson.core:jackson-databind:2.12.1")
     kotlinDependency("com.fasterxml.jackson.core:jackson-core:2.12.1")
     kotlinDependency("com.fasterxml.jackson.core:jackson-annotations:2.12.1")
+    kotlinDependency("circlet:space-automation-runtime:0.1.0")
+    implementation("circlet", "space-automation-runtime", "0.1.0")
     // Kotlin libraries
     kotlinDependency("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     kotlinDependency("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion")

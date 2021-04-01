@@ -42,6 +42,7 @@ class KotlinPlaygroundRestController(private val kotlinProjectExecutor: KotlinPr
               ProjectType.JS, ProjectType.CANVAS -> kotlinProjectExecutor.convertToJs(project)
               ProjectType.JS_IR -> kotlinProjectExecutor.convertToJsIr(project)
               ProjectType.JUNIT -> kotlinProjectExecutor.test(project)
+              ProjectType.AUTOMATION -> error("Automation jobs cannot run in Kotlin Playground")
             }
           }
           "highlight" -> kotlinProjectExecutor.highlight(project)

@@ -17,6 +17,7 @@ enum class ProjectType(@JsonValue val id: String) {
   JAVA("java"),
   JUNIT("junit"),
   CANVAS("canvas"),
+  AUTOMATION("automation"),
   JS("js"),
   JS_IR("js-ir");
 
