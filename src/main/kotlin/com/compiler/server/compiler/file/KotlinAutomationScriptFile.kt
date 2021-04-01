@@ -4,10 +4,11 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.PsiFileFactoryImpl
 import org.intellij.lang.annotations.Language
 
-class KotlinAutomationScriptFIle(val factory: PsiFileFactoryImpl, name: String, val content: String)
+class KotlinAutomationScriptFile(val factory: PsiFileFactoryImpl, name: String, val content: String)
     : KotlinFile(KotlinFileProvider.create(factory, name, wrap(content))) {
 
     companion object {
+
         private const val offsetLine = 4
         private const val offsetChar = 4
 
@@ -32,12 +33,15 @@ class KotlinAutomationScriptFIle(val factory: PsiFileFactoryImpl, name: String, 
     override fun insert(content: String, atLine: Int, atCharacter: Int): KotlinFile {
         val caretPositionOffset = offsetFor(atLine + offsetLine, atCharacter + offsetChar) - offsetFor(offsetLine, offsetChar)
         return if (caretPositionOffset != 0) {
+            val lines = this.content.lines()
+            val previous = lines.take(atLine) + lines[atLine].take(atCharacter)
+            val after = listOf(lines[atLine].drop(atCharacter)) + lines.drop(atLine + 1)
             val newContent = buildString {
-                append(this@KotlinAutomationScriptFIle.content.substring(0, caretPositionOffset))
+                append(previous.joinToString(separator = "\n"))
                 append(content)
-                append(this@KotlinAutomationScriptFIle.content.substring(caretPositionOffset)).toString()
+                append(after.joinToString(separator = "\n"))
             }
-            KotlinAutomationScriptFIle(factory, file.name, newContent)
+            KotlinAutomationScriptFile(factory, file.name, newContent)
         } else this
     }
 

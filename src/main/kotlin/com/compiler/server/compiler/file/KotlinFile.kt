@@ -23,8 +23,8 @@ abstract class KotlinFile(val file: KtFile) {
             val fileName = if (name.endsWith(".kt")) name else "$name.kt"
 
             return when (type) {
-                ProjectType.AUTOMATION -> {
-                    KotlinAutomationScriptFIle(factory, name, content)
+                ProjectType.JAVA -> {
+                    KotlinAutomationScriptFile(factory, name, content)
                 }
                 else -> {
                     KotlinFullFile(factory, KotlinFileProvider.create(factory, fileName, content))

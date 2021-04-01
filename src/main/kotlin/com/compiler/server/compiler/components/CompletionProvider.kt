@@ -63,6 +63,7 @@ class CompletionProvider(
     coreEnvironment: KotlinCoreEnvironment
   ) : List<Completion> = with(file.insert("$COMPLETION_SUFFIX ", line, character)) {
     elementAt(line, character)?.let { element ->
+      println("ELEMENT IS ${element.text}")
       val descriptorInfo = descriptorsFrom(this, element, isJs, coreEnvironment)
       val prefix = (if (descriptorInfo.isTipsManagerCompletion) element.text else element.parent.text)
         .substringBefore(COMPLETION_SUFFIX).let { if (it.endsWith(".")) "" else it }
